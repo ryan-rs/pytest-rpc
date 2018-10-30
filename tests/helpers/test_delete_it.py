@@ -5,11 +5,11 @@ import testinfra.backend.base
 import testinfra.host
 import json
 
-"""Test cases for the 'delete_it' helper function."""
+"""Test cases for the '_delete_it' helper function."""
 
 
 def test_success(mocker):
-    """Verify delete_it completes without raising an error and returns None
+    """Verify _delete_it completes without raising an error and returns None
     when the OpenStack command returns an exit code of '0'.
 
     relies on mocked objects from testinfra
@@ -26,11 +26,11 @@ def test_success(mocker):
     cr1.rc = 0
     cr1.stdout = json.dumps(server)
 
-    assert not pytest_rpc.helpers.delete_it('server', 'myserver', myhost)
+    assert not pytest_rpc.helpers._delete_it('server', 'myserver', myhost)
 
 
 def test_failure(mocker):
-    """Verify delete_it raises an error when the OpenStack command returns an
+    """Verify _delete_it raises an error when the OpenStack command returns an
     exit code of '2'.
 
     relies on mocked objects from testinfra
@@ -46,11 +46,11 @@ def test_failure(mocker):
     cr1.stdout = ''
 
     with pytest.raises(AssertionError):
-        pytest_rpc.helpers.delete_it('server', 'myserver', myhost)
+        pytest_rpc.helpers._delete_it('server', 'myserver', myhost)
 
 
 def test_resource_not_deleted(mocker):
-    """Verify delete_it raises an error when the OpenStack resource is not
+    """Verify _delete_it raises an error when the OpenStack resource is not
     deleted.
 
     relies on mocked objects from testinfra
@@ -67,4 +67,4 @@ def test_resource_not_deleted(mocker):
     cr1.stdout = json.dumps(server)
 
     with pytest.raises(AssertionError):
-        pytest_rpc.helpers.delete_it('server', 'myserver', myhost)
+        pytest_rpc.helpers._delete_it('server', 'myserver', myhost)
