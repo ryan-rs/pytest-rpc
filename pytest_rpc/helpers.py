@@ -646,3 +646,60 @@ def parse_swift_ring_builder(ring_builder_output):
             swift_data[k] = float(v)
 
     return swift_data
+
+
+def os_cli(host, subcommand, options=None, cloud='default', exit_code=0):
+    """Execute an OpenStack CLI command on a given host.
+
+    Args:
+        host (testinfra.Host): Testinfra host with OpenStack CLI installed.
+        subcommand (str): OpenStack sub-command to run on host.
+            (e.g. 'image list')
+        options (list): Command-line options. (e.g. ['--verbose'])
+        cloud (str): The cloud to target for command.
+        exit_code (int): The expected return code for the command.
+
+    Returns:
+        str: The stdout produced by the command.
+
+    Raises:
+        AssertionError: Command returned unexpected exit code.
+    """
+
+    opts = ' '.join(options) if options else ''
+    cmd = ("openstack {subcmd} "
+           "--os-cloud {cloud} "
+           "{opts}".format(subcmd=subcommand, cloud=cloud, opts=opts))
+
+    result = host.run(cmd)
+
+    assert result.rc == exit_code, 'Command returned unexpected exit code!'
+
+    return result.stdout
+
+
+def os_cli_json(host, subcommand, options=None, cloud='default', exit_code=0):
+    """Execute an OpenStack CLI command on a given host with JSON output
+    formatting enabled.
+
+    Args:
+        host (testinfra.Host): Testinfra host with OpenStack CLI installed.
+        subcommand (str): OpenStack sub-command to run on host.
+            (e.g. 'image list')
+        options (list): Command-line options. (e.g. ['--verbose'])
+        cloud (str): The cloud to target for command.
+        exit_code (int): The expected return code for the command.
+
+    Returns:
+        object: The JSON output represented in a nested data structure.
+
+    Raises:
+        AssertionError: Command returned unexpected exit code.
+        ValueError: Command output not JSON compliant. (Probably had an error)
+    """
+
+    opts = options + ['-f json'] if options else ['-f json']
+
+    output = os_cli(host, subcommand, opts, cloud, exit_code)
+
+    return json.loads(output)
